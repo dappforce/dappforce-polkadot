@@ -327,6 +327,93 @@ fn kusama_staging_testnet_config_genesis() -> kusama::GenesisConfig {
 	}
 }
 
+fn kusama_dappforce_testnet_config_genesis() -> kusama::GenesisConfig {
+	let endowed_accounts = vec![
+		hex!["8a5cfbb7304d1e6f7c224724fc23acb38b9ddf7b13a1b2eac526defc65992a46"].into(),
+	];
+
+	let initial_authorities: Vec<(
+		AccountId,
+		AccountId,
+		BabeId,
+		GrandpaId,
+		ImOnlineId,
+		ValidatorId,
+		AuthorityDiscoveryId
+	)> = vec![
+		get_authority_keys_from_seed("Alice"),
+		get_authority_keys_from_seed("Bob")
+	];
+
+	const ENDOWMENT: u128 = 1_000_000 * KSM;
+	const STASH: u128 = 100 * KSM;
+
+	kusama::GenesisConfig {
+		system: Some(kusama::SystemConfig {
+			code: kusama::WASM_BINARY.to_vec(),
+			changes_trie_config: Default::default(),
+		}),
+		balances: Some(kusama::BalancesConfig {
+			balances: endowed_accounts.iter()
+				.map(|k: &AccountId| (k.clone(), ENDOWMENT))
+				.chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
+				.collect(),
+		}),
+		indices: Some(kusama::IndicesConfig {
+			indices: vec![],
+		}),
+		session: Some(kusama::SessionConfig {
+			keys: initial_authorities.iter().map(|x| (
+				x.0.clone(),
+				x.0.clone(),
+				kusama_session_keys(x.2.clone(), x.3.clone(), x.4.clone(), x.5.clone(), x.6.clone()),
+			)).collect::<Vec<_>>(),
+		}),
+		staking: Some(kusama::StakingConfig {
+			validator_count: 50,
+			minimum_validator_count: 4,
+			stakers: initial_authorities
+				.iter()
+				.map(|x| (x.0.clone(), x.1.clone(), STASH, kusama::StakerStatus::Validator))
+				.collect(),
+			invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
+			force_era: Forcing::ForceNone,
+			slash_reward_fraction: Perbill::from_percent(10),
+			.. Default::default()
+		}),
+		democracy: Some(Default::default()),
+		collective_Instance1: Some(kusama::CouncilConfig {
+			members: vec![],
+			phantom: Default::default(),
+		}),
+		collective_Instance2: Some(kusama::TechnicalCommitteeConfig {
+			members: vec![],
+			phantom: Default::default(),
+		}),
+		membership_Instance1: Some(Default::default()),
+		babe: Some(Default::default()),
+		grandpa: Some(Default::default()),
+		im_online: Some(Default::default()),
+		authority_discovery: Some(kusama::AuthorityDiscoveryConfig {
+			keys: vec![],
+		}),
+		parachains: Some(kusama::ParachainsConfig {
+			authorities: vec![],
+		}),
+		registrar: Some(kusama::RegistrarConfig {
+			parachains: vec![],
+			_phdata: Default::default(),
+		}),
+		claims: Some(kusama::ClaimsConfig {
+			claims: vec![],
+			vesting: vec![],
+		}),
+		vesting: Some(kusama::VestingConfig {
+			vesting: vec![],
+		}),
+	}
+}
+
 /// Polkadot staging testnet config.
 pub fn polkadot_staging_testnet_config() -> PolkadotChainSpec {
 	let boot_nodes = vec![];
@@ -350,6 +437,22 @@ pub fn kusama_staging_testnet_config() -> KusamaChainSpec {
 		"Kusama Staging Testnet",
 		"kusama_staging_testnet",
 		kusama_staging_testnet_config_genesis,
+		boot_nodes,
+		Some(TelemetryEndpoints::new(vec![(KUSAMA_STAGING_TELEMETRY_URL.to_string(), 0)])
+			.expect("Kusama Staging telemetry url is valid; qed")),
+		Some(DEFAULT_PROTOCOL_ID),
+		None,
+		Default::default(),
+	)
+}
+
+/// Dappforce testnet config.
+pub fn kusama_dappforce_config() -> KusamaChainSpec {
+	let boot_nodes = vec![];
+	KusamaChainSpec::from_genesis(
+		"Kusama Dappforce  Testnet",
+		"kusama_dappforce_testnet",
+		kusama_dappforce_testnet_config_genesis,
 		boot_nodes,
 		Some(TelemetryEndpoints::new(vec![(KUSAMA_STAGING_TELEMETRY_URL.to_string(), 0)])
 			.expect("Kusama Staging telemetry url is valid; qed")),

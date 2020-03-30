@@ -38,6 +38,8 @@ pub enum ChainSpec {
 	KusamaStagingTestnet,
 	/// Whatever the current kusama runtime is, with simple Alice/Bob auths.
 	KusamaLocalTestnet,
+	/// The Kusama network with modified authorities
+	DappforceKusama,
 }
 
 impl Default for ChainSpec {
@@ -58,6 +60,7 @@ impl ChainSpec {
 			ChainSpec::KusamaStagingTestnet => Box::new(service::chain_spec::kusama_staging_testnet_config()),
 			ChainSpec::Westend => Box::new(service::chain_spec::westend_config()?),
 			ChainSpec::Kusama => Box::new(service::chain_spec::kusama_config()?),
+			ChainSpec::DappforceKusama => Box::new(service::chain_spec::kusama_dappforce_config()),
 		})
 	}
 
@@ -71,6 +74,7 @@ impl ChainSpec {
 			"kusama-staging" => Some(ChainSpec::KusamaStagingTestnet),
 			"kusama" => Some(ChainSpec::Kusama),
 			"westend" => Some(ChainSpec::Westend),
+			"dappforce" => Some(ChainSpec::DappforceKusama),
 			"" => Some(ChainSpec::default()),
 			_ => None,
 		}

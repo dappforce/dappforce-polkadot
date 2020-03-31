@@ -329,7 +329,7 @@ fn kusama_staging_testnet_config_genesis() -> kusama::GenesisConfig {
 
 fn kusama_dappforce_testnet_config_genesis() -> kusama::GenesisConfig {
 	let endowed_accounts = vec![
-		hex!["8a5cfbb7304d1e6f7c224724fc23acb38b9ddf7b13a1b2eac526defc65992a46"].into(),
+		hex!["be40875ac93688e136424243ade16eb27dbb60ac585968e801ec27a9804fbe5c"].into(),
 	];
 
 	let initial_authorities: Vec<(
@@ -340,10 +340,23 @@ fn kusama_dappforce_testnet_config_genesis() -> kusama::GenesisConfig {
 		ImOnlineId,
 		ValidatorId,
 		AuthorityDiscoveryId
-	)> = vec![
-		get_authority_keys_from_seed("Alice"),
-		get_authority_keys_from_seed("Bob")
-	];
+	)> = vec![(
+	   hex!["c0f1d4e975e2bf84e042f753998c01d56a1e3c99eb9ea9031776562465cc1554"].into(),
+	   hex!["c0f1d4e975e2bf84e042f753998c01d56a1e3c99eb9ea9031776562465cc1554"].into(),
+	   hex!["a82742d74d14da1f4541bf155cb89bd3983c3870118db8f6b7bb615ac7b77c5a"].unchecked_into(),
+	   hex!["bab51b95f12cfcbe781b5040b9f16de40a99ab277b1324ecc9ecc92940ac9b36"].unchecked_into(),
+	   hex!["a82742d74d14da1f4541bf155cb89bd3983c3870118db8f6b7bb615ac7b77c5a"].unchecked_into(),
+	   hex!["a82742d74d14da1f4541bf155cb89bd3983c3870118db8f6b7bb615ac7b77c5a"].unchecked_into(),
+	   hex!["a82742d74d14da1f4541bf155cb89bd3983c3870118db8f6b7bb615ac7b77c5a"].unchecked_into(),
+	),(
+	   hex!["dadda504bc39c43a45e4e1baf590e7dd3dafbdf30f723f8eee6a291e9a49413a"].into(),
+	   hex!["dadda504bc39c43a45e4e1baf590e7dd3dafbdf30f723f8eee6a291e9a49413a"].into(),
+	   hex!["ecf57ead3d6dcd9380344eb665c906a7f37b40a77300cbc622781ea62eabce62"].unchecked_into(),
+	   hex!["900bfad9df182992b0b8b6672ba1481f60bdeb5fb336d792f1b350f6282f879c"].unchecked_into(),
+	   hex!["ecf57ead3d6dcd9380344eb665c906a7f37b40a77300cbc622781ea62eabce62"].unchecked_into(),
+	   hex!["ecf57ead3d6dcd9380344eb665c906a7f37b40a77300cbc622781ea62eabce62"].unchecked_into(),
+	   hex!["ecf57ead3d6dcd9380344eb665c906a7f37b40a77300cbc622781ea62eabce62"].unchecked_into(),
+	)];
 
 	const ENDOWMENT: u128 = 1_000_000 * KSM;
 	const STASH: u128 = 100 * KSM;

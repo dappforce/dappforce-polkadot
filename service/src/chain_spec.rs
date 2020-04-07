@@ -463,7 +463,7 @@ pub fn kusama_staging_testnet_config() -> KusamaChainSpec {
 pub fn kusama_dappforce_config() -> KusamaChainSpec {
 	let boot_nodes = vec![];
 	KusamaChainSpec::from_genesis(
-		"Kusama Dappforce  Testnet",
+		"Kusama Dappforce Testnet",
 		"kusama_dappforce_testnet",
 		kusama_dappforce_testnet_config_genesis,
 		boot_nodes,

@@ -327,6 +327,106 @@ fn kusama_staging_testnet_config_genesis() -> kusama::GenesisConfig {
 	}
 }
 
+fn kusama_dappforce_testnet_config_genesis() -> kusama::GenesisConfig {
+	let endowed_accounts = vec![
+		hex!["be40875ac93688e136424243ade16eb27dbb60ac585968e801ec27a9804fbe5c"].into(),
+	];
+
+	let initial_authorities: Vec<(
+		AccountId,
+		AccountId,
+		BabeId,
+		GrandpaId,
+		ImOnlineId,
+		ValidatorId,
+		AuthorityDiscoveryId
+	)> = vec![(
+	   hex!["c0f1d4e975e2bf84e042f753998c01d56a1e3c99eb9ea9031776562465cc1554"].into(),
+	   hex!["c0f1d4e975e2bf84e042f753998c01d56a1e3c99eb9ea9031776562465cc1554"].into(),
+	   hex!["a82742d74d14da1f4541bf155cb89bd3983c3870118db8f6b7bb615ac7b77c5a"].unchecked_into(),
+	   hex!["bab51b95f12cfcbe781b5040b9f16de40a99ab277b1324ecc9ecc92940ac9b36"].unchecked_into(),
+	   hex!["a82742d74d14da1f4541bf155cb89bd3983c3870118db8f6b7bb615ac7b77c5a"].unchecked_into(),
+	   hex!["a82742d74d14da1f4541bf155cb89bd3983c3870118db8f6b7bb615ac7b77c5a"].unchecked_into(),
+	   hex!["a82742d74d14da1f4541bf155cb89bd3983c3870118db8f6b7bb615ac7b77c5a"].unchecked_into(),
+	),(
+	   hex!["dadda504bc39c43a45e4e1baf590e7dd3dafbdf30f723f8eee6a291e9a49413a"].into(),
+	   hex!["dadda504bc39c43a45e4e1baf590e7dd3dafbdf30f723f8eee6a291e9a49413a"].into(),
+	   hex!["ecf57ead3d6dcd9380344eb665c906a7f37b40a77300cbc622781ea62eabce62"].unchecked_into(),
+	   hex!["900bfad9df182992b0b8b6672ba1481f60bdeb5fb336d792f1b350f6282f879c"].unchecked_into(),
+	   hex!["ecf57ead3d6dcd9380344eb665c906a7f37b40a77300cbc622781ea62eabce62"].unchecked_into(),
+	   hex!["ecf57ead3d6dcd9380344eb665c906a7f37b40a77300cbc622781ea62eabce62"].unchecked_into(),
+	   hex!["ecf57ead3d6dcd9380344eb665c906a7f37b40a77300cbc622781ea62eabce62"].unchecked_into(),
+	)];
+
+	const ENDOWMENT: u128 = 1_000_000 * KSM;
+	const STASH: u128 = 100 * KSM;
+
+	kusama::GenesisConfig {
+		system: Some(kusama::SystemConfig {
+			code: kusama::WASM_BINARY.to_vec(),
+			changes_trie_config: Default::default(),
+		}),
+		balances: Some(kusama::BalancesConfig {
+			balances: endowed_accounts.iter()
+				.map(|k: &AccountId| (k.clone(), ENDOWMENT))
+				.chain(initial_authorities.iter().map(|x| (x.0.clone(), STASH)))
+				.collect(),
+		}),
+		indices: Some(kusama::IndicesConfig {
+			indices: vec![],
+		}),
+		session: Some(kusama::SessionConfig {
+			keys: initial_authorities.iter().map(|x| (
+				x.0.clone(),
+				x.0.clone(),
+				kusama_session_keys(x.2.clone(), x.3.clone(), x.4.clone(), x.5.clone(), x.6.clone()),
+			)).collect::<Vec<_>>(),
+		}),
+		staking: Some(kusama::StakingConfig {
+			validator_count: 50,
+			minimum_validator_count: 4,
+			stakers: initial_authorities
+				.iter()
+				.map(|x| (x.0.clone(), x.1.clone(), STASH, kusama::StakerStatus::Validator))
+				.collect(),
+			invulnerables: initial_authorities.iter().map(|x| x.0.clone()).collect(),
+			force_era: Forcing::ForceNone,
+			slash_reward_fraction: Perbill::from_percent(10),
+			.. Default::default()
+		}),
+		democracy: Some(Default::default()),
+		collective_Instance1: Some(kusama::CouncilConfig {
+			members: vec![],
+			phantom: Default::default(),
+		}),
+		collective_Instance2: Some(kusama::TechnicalCommitteeConfig {
+			members: vec![],
+			phantom: Default::default(),
+		}),
+		membership_Instance1: Some(Default::default()),
+		babe: Some(Default::default()),
+		grandpa: Some(Default::default()),
+		im_online: Some(Default::default()),
+		authority_discovery: Some(kusama::AuthorityDiscoveryConfig {
+			keys: vec![],
+		}),
+		parachains: Some(kusama::ParachainsConfig {
+			authorities: vec![],
+		}),
+		registrar: Some(kusama::RegistrarConfig {
+			parachains: vec![],
+			_phdata: Default::default(),
+		}),
+		claims: Some(kusama::ClaimsConfig {
+			claims: vec![],
+			vesting: vec![],
+		}),
+		vesting: Some(kusama::VestingConfig {
+			vesting: vec![],
+		}),
+	}
+}
+
 /// Polkadot staging testnet config.
 pub fn polkadot_staging_testnet_config() -> PolkadotChainSpec {
 	let boot_nodes = vec![];
@@ -350,6 +450,22 @@ pub fn kusama_staging_testnet_config() -> KusamaChainSpec {
 		"Kusama Staging Testnet",
 		"kusama_staging_testnet",
 		kusama_staging_testnet_config_genesis,
+		boot_nodes,
+		Some(TelemetryEndpoints::new(vec![(KUSAMA_STAGING_TELEMETRY_URL.to_string(), 0)])
+			.expect("Kusama Staging telemetry url is valid; qed")),
+		Some(DEFAULT_PROTOCOL_ID),
+		None,
+		Default::default(),
+	)
+}
+
+/// Dappforce testnet config.
+pub fn kusama_dappforce_config() -> KusamaChainSpec {
+	let boot_nodes = vec![];
+	KusamaChainSpec::from_genesis(
+		"Kusama Dappforce Testnet",
+		"kusama_dappforce_testnet",
+		kusama_dappforce_testnet_config_genesis,
 		boot_nodes,
 		Some(TelemetryEndpoints::new(vec![(KUSAMA_STAGING_TELEMETRY_URL.to_string(), 0)])
 			.expect("Kusama Staging telemetry url is valid; qed")),
